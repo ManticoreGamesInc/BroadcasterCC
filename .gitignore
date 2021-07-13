@@ -6,10 +6,6 @@ Temp/
 # No need to synchronize
 UserSettings/
 
-# Screenshots used when publishing & for project thumbnails in the Create tab
-# Comment out if you want to synchronize screenshots
-Screenshots/
-
 # Directory created when migrating from an old storage format
 # No need to synchronize
 .core_backup/
