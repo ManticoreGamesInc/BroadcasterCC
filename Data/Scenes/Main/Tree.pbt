@@ -129,6 +129,16 @@ Objects {
           Name: "Name"
           String: "Broadcaster"
         }
+        Overrides {
+          Name: "Position"
+          Vector {
+          }
+        }
+        Overrides {
+          Name: "Rotation"
+          Rotator {
+          }
+        }
       }
     }
     TemplateAsset {
@@ -926,6 +936,8 @@ Objects {
           HighDistance: 9000
         }
       }
+      PlayerInteractDistance: 500
+      PlayerInteractAngleDeg: 50
     }
   }
 }
