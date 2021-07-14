@@ -1,6 +1,6 @@
 --[[
 	User Study - Camera
-	v1.1
+	v1.2
 	by: standardcombo
 	
 	Spectator camera that follows the subject around. The camera's
@@ -12,6 +12,12 @@ local ROOT = script.parent
 local CAMERA = script:GetCustomProperty("Camera"):WaitForObject()
 
 local PLAYER = Game.GetLocalPlayer()
+
+if not _G.UserStudy then
+	Task.Wait()
+end
+_G.UserStudy.CameraRoot = ROOT
+_G.UserStudy.Camera = CAMERA
 
 local isActive = false
 local eventListeners = {}

@@ -166,6 +166,7 @@ Assets {
         }
         ParentId: 854925687571159956
         ChildIds: 1210003098773427160
+        ChildIds: 4880160696751664669
         ChildIds: 2317382369173195992
         UnregisteredParameters {
           Overrides {
@@ -244,6 +245,139 @@ Assets {
         }
       }
       Objects {
+        Id: 4880160696751664669
+        Name: "Aerial Camera Root"
+        Transform {
+          Location {
+          }
+          Rotation {
+          }
+          Scale {
+            X: 1
+            Y: 1
+            Z: 1
+          }
+        }
+        ParentId: 4066993593545738074
+        ChildIds: 13575686359152190255
+        ChildIds: 12129381194899263218
+        Collidable_v2 {
+          Value: "mc:ecollisionsetting:inheritfromparent"
+        }
+        Visible_v2 {
+          Value: "mc:evisibilitysetting:inheritfromparent"
+        }
+        CameraCollidable {
+          Value: "mc:ecollisionsetting:inheritfromparent"
+        }
+        EditorIndicatorVisibility {
+          Value: "mc:eindicatorvisibility:visiblewhenselected"
+        }
+        Folder {
+          IsGroup: true
+        }
+      }
+      Objects {
+        Id: 13575686359152190255
+        Name: "BroadcasterAerialCamera"
+        Transform {
+          Location {
+          }
+          Rotation {
+          }
+          Scale {
+            X: 1
+            Y: 1
+            Z: 1
+          }
+        }
+        ParentId: 4880160696751664669
+        UnregisteredParameters {
+          Overrides {
+            Name: "cs:Camera"
+            ObjectReference {
+              SubObjectId: 12129381194899263218
+            }
+          }
+          Overrides {
+            Name: "cs:RotationSpeed"
+            Float: 3
+          }
+          Overrides {
+            Name: "cs:LookAtTarget"
+            ObjectReference {
+              SelfId: 17821762702390537535
+              SubObjectId: 6720360324666183186
+              InstanceId: 17370492810545863386
+              TemplateId: 4004712493737609426
+            }
+          }
+        }
+        Collidable_v2 {
+          Value: "mc:ecollisionsetting:inheritfromparent"
+        }
+        Visible_v2 {
+          Value: "mc:evisibilitysetting:inheritfromparent"
+        }
+        CameraCollidable {
+          Value: "mc:ecollisionsetting:inheritfromparent"
+        }
+        EditorIndicatorVisibility {
+          Value: "mc:eindicatorvisibility:visiblewhenselected"
+        }
+        Script {
+          ScriptAsset {
+            Id: 16965813575518165477
+          }
+        }
+      }
+      Objects {
+        Id: 12129381194899263218
+        Name: "Camera"
+        Transform {
+          Location {
+            X: -5000
+            Z: 2800
+          }
+          Rotation {
+          }
+          Scale {
+            X: 1
+            Y: 1
+            Z: 1
+          }
+        }
+        ParentId: 4880160696751664669
+        Collidable_v2 {
+          Value: "mc:ecollisionsetting:inheritfromparent"
+        }
+        Visible_v2 {
+          Value: "mc:evisibilitysetting:inheritfromparent"
+        }
+        CameraCollidable {
+          Value: "mc:ecollisionsetting:inheritfromparent"
+        }
+        EditorIndicatorVisibility {
+          Value: "mc:eindicatorvisibility:alwaysvisible"
+        }
+        Camera {
+          MinDistance: 300
+          MaxDistance: 600
+          PositionOffset {
+          }
+          RotationOffset {
+          }
+          FieldOfView: 90
+          ViewWidth: 1200
+          RotationMode {
+            Value: "mc:erotationmode:default"
+          }
+          MinPitch: -89
+          MaxPitch: 89
+          DoesPositionOffsetSpring: true
+        }
+      }
+      Objects {
         Id: 2317382369173195992
         Name: "UI Container"
         Transform {
@@ -302,5 +436,6 @@ Assets {
       AssetId: "None"
     }
   }
-  SerializationVersion: 91
+  SerializationVersion: 92
+  DirectlyPublished: true
 }

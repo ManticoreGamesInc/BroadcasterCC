@@ -1,6 +1,6 @@
 --[[
 	Broadcaster - Chat Commands
-	v1.1
+	v1.2
 	by: standardcombo
 	
 	Intercepts text written in the chat. If it's formatted as a command,
