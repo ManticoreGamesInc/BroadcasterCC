@@ -1,6 +1,6 @@
 --[[
 	User Study - API
-	v1.3.3
+	v1.3.4
 	by: standardcombo
 	
 	Provides a set of functions to control and to get information about
@@ -118,10 +118,6 @@ function API.BeginStudy(observer, arguments)
 			data.camera = camera
 		end
 		
-		-- Let other scripts and client know
-		Events.Broadcast(EVENT_STUDY_STARTED, observer)
-		Events.BroadcastToPlayer(observer, EVENT_STUDY_STARTED)
-		
 		-- Register in observers table
 		API.activeObservers[observer] = true
 		
@@ -174,6 +170,11 @@ function API.BeginStudy(observer, arguments)
 		if not Object.IsValid(data.subject) then
 			--Chat.BroadcastMessage("Waiting for subject.", {players = observer})
 		end
+		
+		-- Let other scripts and client know
+		local params = {subject = data.subject}
+		Events.Broadcast(EVENT_STUDY_STARTED, observer, params)
+		Events.BroadcastToPlayer(observer, EVENT_STUDY_STARTED, params)
 	end
 end
 

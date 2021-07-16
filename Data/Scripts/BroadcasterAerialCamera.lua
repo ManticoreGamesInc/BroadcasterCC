@@ -1,6 +1,6 @@
 --[[
 	Broadcaster - Aerial Camera
-	v1.0.1
+	v1.0.2
 	by: standardcombo
 --]]
 local ROOT = script.parent
@@ -11,6 +11,7 @@ local ACTIVATION_BINDING = script:GetCustomProperty("ActivationBinding")
 local PLAYER = Game.GetLocalPlayer()
 
 local eventListener = nil
+local detectionMinTime = 0
 
 ROOT:RotateContinuous(Rotation.New(0,0,1), ROTATION_SPEED)
 
@@ -23,7 +24,7 @@ function OnBindingPressed(player, action)
 				PLAYER:SetOverrideCamera(_G.UserStudy.Camera)
 			end
 		else
-			PLAYER:SetOverrideCamera(CAMERA)
+			ActivateAerialCam()
 		end
 	end
 end
@@ -45,18 +46,28 @@ function Update()
 		end
 		
 		-- Detect case where we are observer but there is no subject
-		local activeCam = PLAYER:GetActiveCamera()
-		if activeCam ~= CAMERA
-		and _G.UserStudy.GetSubjectForObserver(PLAYER) == nil then
-			PLAYER:SetOverrideCamera(CAMERA)
-			if Object.IsValid(LOOK_AT_TARGET) then
-				CAMERA:LookAt(LOOK_AT_TARGET:GetWorldPosition())
+		if time() > detectionMinTime then
+			local activeCam = PLAYER:GetActiveCamera()
+			if activeCam ~= CAMERA
+			and _G.UserStudy.GetSubjectForObserver(PLAYER) == nil then
+				ActivateAerialCam()
 			end
 		end
 	end
 end
 
-function OnStudyStarted()
+function ActivateAerialCam()
+	PLAYER:SetOverrideCamera(CAMERA)
+	if Object.IsValid(LOOK_AT_TARGET) then
+		CAMERA:LookAt(LOOK_AT_TARGET:GetWorldPosition())
+	end
+end
+
+function OnStudyStarted(params)
+	if params.subject then
+		detectionMinTime = time() + 1
+	end
+	
 	eventListener = PLAYER.bindingPressedEvent:Connect(OnBindingPressed)
 	
 	isUpdating = true
