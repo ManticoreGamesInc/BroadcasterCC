@@ -1,4 +1,8 @@
-
+--[[
+	Broadcaster - Aerial Camera
+	v1.0.1
+	by: standardcombo
+--]]
 local ROOT = script.parent
 local CAMERA = script:GetCustomProperty("Camera"):WaitForObject()
 local LOOK_AT_TARGET = script:GetCustomProperty("LookAtTarget"):WaitForObject()
@@ -8,12 +12,16 @@ local PLAYER = Game.GetLocalPlayer()
 
 local eventListener = nil
 
+ROOT:RotateContinuous(Rotation.New(0,0,1), ROTATION_SPEED)
 
 function OnBindingPressed(player, action)
 	if action == ACTIVATION_BINDING and _G.UserStudy.IsObserver(PLAYER) then
 		local activeCam = PLAYER:GetActiveCamera()
 		if activeCam == CAMERA and _G.UserStudy.Camera then
-			PLAYER:SetOverrideCamera(_G.UserStudy.Camera)
+			local subjectNames = _G.UserStudy.GetSubjectNames()
+			if #subjectNames > 0 then
+				PLAYER:SetOverrideCamera(_G.UserStudy.Camera)
+			end
 		else
 			PLAYER:SetOverrideCamera(CAMERA)
 		end
@@ -24,7 +32,7 @@ end
 function Update()
 	while isUpdating do
 		Task.Wait()
-		ROOT:SetRotation(Rotation.New(0,0,1) * time() * ROTATION_SPEED)
+		--ROOT:SetRotation(Rotation.New(0,0,1) * time() * ROTATION_SPEED)
 		if Object.IsValid(LOOK_AT_TARGET) then
 			local rot = CAMERA:GetWorldRotation()
 			CAMERA:LookAt(LOOK_AT_TARGET:GetWorldPosition())
@@ -39,9 +47,11 @@ function Update()
 		-- Detect case where we are observer but there is no subject
 		local activeCam = PLAYER:GetActiveCamera()
 		if activeCam ~= CAMERA
-		and Object.IsValid(_G.UserStudy.CameraRoot)
-		and _G.UserStudy.CameraRoot.parent ~= nil then
+		and _G.UserStudy.GetSubjectForObserver(PLAYER) == nil then
 			PLAYER:SetOverrideCamera(CAMERA)
+			if Object.IsValid(LOOK_AT_TARGET) then
+				CAMERA:LookAt(LOOK_AT_TARGET:GetWorldPosition())
+			end
 		end
 	end
 end

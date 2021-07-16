@@ -88,7 +88,7 @@ Assets {
         UnregisteredParameters {
           Overrides {
             Name: "cs:Admins"
-            String: "Bot1,standardcombo, GetchLives,CoreVideo,Scav,Rolok"
+            String: "Bot1,Bot2,Bot3,standardcombo, GetchLives,CoreVideo,Scav,Rolok"
           }
         }
         Collidable_v2 {
@@ -251,6 +251,7 @@ Assets {
           Location {
           }
           Rotation {
+            Yaw: 180
           }
           Scale {
             X: 1
@@ -306,10 +307,7 @@ Assets {
           Overrides {
             Name: "cs:LookAtTarget"
             ObjectReference {
-              SelfId: 17821762702390537535
-              SubObjectId: 6720360324666183186
-              InstanceId: 17370492810545863386
-              TemplateId: 4004712493737609426
+              SubObjectId: 4880160696751664669
             }
           }
         }

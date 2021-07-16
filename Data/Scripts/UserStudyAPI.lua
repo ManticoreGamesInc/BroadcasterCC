@@ -1,6 +1,6 @@
 --[[
 	User Study - API
-	v1.2
+	v1.3.3
 	by: standardcombo
 	
 	Provides a set of functions to control and to get information about
@@ -31,6 +31,8 @@
 	- GetSubjectNames() - returns string
 	- RemoveObservers(Player[])
 	- FindPlayerWithName(string playerName)
+	- GetSubjectForObserver(observer)
+	- ReplaceWithSubjectIfObserver(observer)
 	
 --]]
 
@@ -70,6 +72,7 @@ function API.BeginStudy(observer, arguments)
 	--observer.team = 0
 
 	-- Prepare arguments
+	if not arguments then arguments = {} end
 	local playerName = nil
 	if #arguments > 0 then
 		playerName = arguments[1]
@@ -136,9 +139,23 @@ function API.BeginStudy(observer, arguments)
 		end
 		observer:AttachToCoreObject(data.attachmentObject)
 		
+		-- Attachment object should follow the camera, so terrain shows the correct quality
+		data.attachmentObject:Follow(data.camera)
+		
 		-- Disable observer
 		observer.isVisible = false
 		observer.isCollidable = false
+		
+		-- If this player was being studied by another observer, tell them to study next player
+		if API.IsSubject(observer) then
+			UpdateSubjectList()
+			for obs,_ in pairs(API.activeObservers) do
+				local _d = GetStudyData(obs)
+				if _d.subject == observer then
+					API.NextSubject(obs)
+				end
+			end
+		end
 		
 		-- Additional command arguments
 		if playerName then
@@ -224,16 +241,17 @@ function SetSubject(observer, subject)
 	-- Save a reference to the subject into the observer's data
 	local data = GetStudyData(observer)
 	data.subject = subject
+
+	-- Pass subject's id to the observer's client
+	observer:SetPrivateNetworkedData("UserStudy_SubjectId", subject.id)
 	
 	UpdateSubjectList()
 	
 	-- Setup spectator camera
 	local camera = data.camera
 	local pos = subject:GetWorldPosition()
-	--local rot = subject:GetWorldRotation()
 	if Object.IsValid(camera) then
 		camera:SetWorldPosition(pos)
-		--camera:SetWorldRotation(rot)
 	else
 		camera = World.SpawnAsset(SPECTATOR_CAMERA, {position = pos, rotation = rot})
 		camera:SetNetworkedCustomProperty("OwnerID", observer.id)
@@ -252,6 +270,18 @@ function API.NextSubject(observer)
 	local players = SortPlayersForNextPrev(observer)
 	if players then
 		SetSubject(observer, players[1])
+	else
+		-- Study nobody
+		local data = GetStudyData(observer)
+		if data.subject then
+			data.subject = nil
+			data.camera:Detach()
+			observer:SetPrivateNetworkedData("UserStudy_SubjectId", "")
+		end
+		
+		-- Let other scripts and client know
+		Events.Broadcast(EVENT_SUBJECT_CHANGED, observer, nil)
+		Events.BroadcastToPlayer(observer, EVENT_SUBJECT_CHANGED, nil)
 	end
 end
 
@@ -269,7 +299,8 @@ function SortPlayersForNextPrev(observer)
 		return nil
 	end
 	
-	local players = Game.GetPlayers({ignorePlayers = observer})
+	local players = Game.GetPlayers()
+	API.RemoveObservers(players)
 	if #players <= 0 then
 		return nil
 	end
@@ -339,6 +370,7 @@ function OnPlayerJoined(player)
 		player.resourceChangedEvent:Connect(OnLocalPlayerResourceChanged)
 	end
 	
+	-- If some observers have no subject, now try to find them one
 	for observer,_ in pairs(API.activeObservers) do
 		local data = GetStudyData(observer)
 		if data.isStudying and not Object.IsValid(data.subject) then
@@ -355,24 +387,15 @@ function OnPlayerLeft(player)
 			API.EndStudy(player)
 		end
 		
+		Task.Wait(0.5)
+		
 		-- Check if the player who left was a subject
 		for observer,_ in pairs(API.activeObservers) do
 			local data = GetStudyData(observer)
 			if data.isStudying and data.subject == player then
 				--Chat.BroadcastMessage("Subject Left the game: " .. player.name, {players = observer})
 			
-				data.attachmentObject:Detach()
-				
-				Task.Wait(0.5)
-				if not Object.IsValid(observer) then return end
-				
 				API.NextSubject(observer)
-				
-				if not Object.IsValid(data.subject) then
-					-- Let other scripts and client know
-					Events.Broadcast(EVENT_SUBJECT_CHANGED, observer, nil)
-					Events.BroadcastToPlayer(observer, EVENT_SUBJECT_CHANGED, nil)
-				end
 			end
 		end
 		
@@ -439,6 +462,9 @@ end
 -- Client / Server
 function API.GetSubjectNames()
 	local str = API.networkedObject:GetCustomProperty("Subjects")
+	if string.len(str) == 0 then
+		return {}
+	end
 	local result = {CoreString.Split(str, ",")}
 	return result
 end
@@ -450,7 +476,7 @@ function UpdateSubjectList()
 	local count = 0
 	for observer,_ in pairs(API.activeObservers) do
 		local data = GetStudyData(observer)
-		if Object.IsValid(data.subject) then
+		if Object.IsValid(data.subject) and not API.IsObserver(data.subject) then
 			API.activeSubjects[data.subject] = true
 			
 			if count > 0 then
@@ -633,6 +659,34 @@ function API.RemoveObservers(playerArray)
 			table.remove(playerArray, i)
 		end
 	end
+	return playerArray
+end
+
+-- Server & Client
+function API.GetSubjectForObserver(observer)
+	if Environment.IsClient() then
+		local subjectId = observer:GetPrivateNetworkedData("UserStudy_SubjectId")
+		if subjectId then
+			return Game.FindPlayer(subjectId)
+		end
+	else
+		local data = GetStudyData(observer)
+		if data then
+			return data.subject
+		end
+	end
+	return nil
+end
+
+-- Server & Client
+function API.ReplaceWithSubjectIfObserver(observer)
+	if API.IsObserver(observer) then
+		local subject = _G.UserStudy.GetSubjectForObserver(observer)
+		if subject then
+			return subject
+		end
+	end
+	return observer
 end
 
 return API

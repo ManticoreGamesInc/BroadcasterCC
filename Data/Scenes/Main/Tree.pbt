@@ -25,6 +25,7 @@ Objects {
   ChildIds: 6900078058982177178
   ChildIds: 13088478825878704748
   ChildIds: 11620190575967876477
+  ChildIds: 11220073285751729322
   UnregisteredParameters {
   }
   Collidable_v2 {
@@ -37,6 +38,38 @@ Objects {
     Value: "mc:ecollisionsetting:inheritfromparent"
   }
   Folder {
+  }
+}
+Objects {
+  Id: 11220073285751729322
+  Name: "Nameplates"
+  Transform {
+    Scale {
+      X: 1
+      Y: 1
+      Z: 1
+    }
+  }
+  ParentId: 4781671109827199097
+  Collidable_v2 {
+    Value: "mc:ecollisionsetting:inheritfromparent"
+  }
+  Visible_v2 {
+    Value: "mc:evisibilitysetting:inheritfromparent"
+  }
+  TemplateInstance {
+    ParameterOverrideMap {
+      key: 15979967455835987047
+      value {
+        Overrides {
+          Name: "Name"
+          String: "Nameplates"
+        }
+      }
+    }
+    TemplateAsset {
+      Id: 7828553910958214968
+    }
   }
 }
 Objects {
